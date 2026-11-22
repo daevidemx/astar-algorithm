@@ -1,17 +1,19 @@
 #include <raylib.h>
+#include <cmath>
 
-void RenderMap(int map[32][32], int nRows, int nCols, int tileSize);
+void RenderMap(int map[64][64], int nRows, int nCols, int tileSize);
+void MakeWalls(int map[64][64], int tileSize);
 
 int main() {
 
     //MAP
-    int map[32][32] = {0};
+    int map[64][64] = {0};
     map[0][0] = 1;
-    map[31][31] = 2;
+    map[63][63] = 2;
 
     int nRows = sizeof(map) / sizeof(map[0]);
     int nCols = sizeof(map[0]) / sizeof(map[0][0]);
-    int tileSize = 24;
+    int tileSize = 12;
 
     //WINDOW
     int scrWidth = nCols * tileSize;
@@ -21,6 +23,9 @@ int main() {
 
     //MAIN LOOP
     while (!WindowShouldClose()) {
+
+        MakeWalls(map, tileSize);
+
         BeginDrawing();
         ClearBackground(BLACK);
         RenderMap(map, nRows, nCols, tileSize);
@@ -31,7 +36,7 @@ int main() {
     return 0;
 }
 
-void RenderMap(int map[32][32], int nRows, int nCols, int tileSize) {
+void RenderMap(int map[64][64], int nRows, int nCols, int tileSize) {
     for (int i = 0; i < nRows; i++) {
         for (int j = 0; j < nCols; j++) {
             switch (map[i][j]) {
@@ -44,9 +49,19 @@ void RenderMap(int map[32][32], int nRows, int nCols, int tileSize) {
                 case 2:
                     DrawRectangle(j * tileSize, i * tileSize, 100, 100, GREEN);
                     break;
+                case 3:
+                    DrawRectangle(j * tileSize, i * tileSize, 100, 100, BLACK);
+                    break;
                 default:
                     break;
             }
         }
+    }
+}
+void MakeWalls(int map[64][64], int tileSize) {
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        int clickCol = GetMouseY() / tileSize;
+        int clickRow = GetMouseX() / tileSize;
+        map[clickCol][clickRow] = 3;
     }
 }
