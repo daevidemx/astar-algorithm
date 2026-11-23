@@ -123,6 +123,7 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
             int fBest = INT_MAX;
             int nextRow = -1;
             int nextCol = -1;
+            bool foundEnd = false;
 
             //CHECK NEIGHBORING NODES
             for (int i = -1; i <= 1; i++) {
@@ -137,6 +138,12 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
                         int scnRow = currRow + i;
                         int scnCol = currCol + j;
                         Node & scnNode = map[scnRow][scnCol];
+
+                        //CHECK IF SCAN NODE IS END NODE
+                        if (scnRow == endRow && scnCol == endCol) {
+                            foundEnd = true;
+                            break;
+                        }
 
                         //SET COST
                         int cost = -1;
@@ -164,7 +171,14 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
                         }
                     }
                 }
+                if (foundEnd) {
+                    break;
+                }
             }
+            if (foundEnd) {
+                break;
+            }
+
             //REGISTER WHICH NODE IS BEING JUMPED FROM
             map[nextRow][nextCol].from = {currRow, currCol};
 
