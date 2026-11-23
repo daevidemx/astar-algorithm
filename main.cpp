@@ -2,6 +2,7 @@
 #include <cmath>
 #include <climits>
 #include <algorithm>
+
 struct From {
     int row;
     int col;
@@ -15,9 +16,9 @@ struct Node {
 };
 
 void RenderMap(Node map[64][64], int nRows, int nCols, int tileSize);
-void MakeWalls(Node map[64][64], int tileSize);
 void FindPath(Node map[64][64], int nRows, int nCols);
-void ChangePlacement(Node map[64][64], int tileSize, int nRows, int nCols);
+void ChangePlacement(Node map[64][64], int nRows, int nCols, int tileSize);
+void ClearMap(Node map[64][64], int nRows, int nCols, char mouseBtn);
 
 int main() {
 
@@ -42,8 +43,7 @@ int main() {
     //MAIN LOOP
     while (!WindowShouldClose()) {
 
-        ChangePlacement(map, tileSize, nRows, nCols);
-        MakeWalls(map, tileSize);
+        ChangePlacement(map, nRows, nCols, tileSize);
         FindPath(map, nRows, nCols);
 
         BeginDrawing();
@@ -82,15 +82,8 @@ void RenderMap(Node map[64][64], int nRows, int nCols, int tileSize) {
         }
     }
 }
-void MakeWalls(Node map[64][64], int tileSize) {
-    if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
-        int clickCol = GetMouseX() / tileSize;
-        int clickRow = GetMouseY() / tileSize;
-        map[clickRow][clickCol].id = 3;
-    }
-}
 void FindPath(Node map[64][64], int nRows, int nCols) {
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(KEY_SPACE)) {
 
         //START AND END NODE COORDS
         int startRow = -1;
@@ -181,39 +174,45 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
         }
     }
 }
-void ChangePlacement(Node map[64][64], int tileSize, int nRows, int nCols) {
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-
-        for (int i = 0; i < nRows; i++) {
-            for (int j = 0; j < nCols; j++) {
-                Node & node = map[i][j];
-                if (node.id == 1) {
-                    node.id = 0;
-                } else if (node.id == 4) {
-                    node.id = 0;
-                }
-            }
-        }
-
+void ChangePlacement(Node map[64][64], int nRows, int nCols, int tileSize) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        ClearMap(map, nRows, nCols, 'L');
         int clickCol = GetMouseX() / tileSize;
         int clickRow = GetMouseY() / tileSize;
         map[clickRow][clickCol].id = 1;
-
-    } else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-
-        for (int i = 0; i < nRows; i++) {
-            for (int j = 0; j < nCols; j++) {
-                Node & node = map[i][j];
-                if (node.id == 2) {
-                    node.id = 0;
-                } else if (node.id == 4) {
-                    node.id = 0;
-                }
-            }
-        }
-
+    } else if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        ClearMap(map, nRows, nCols, 'R');
         int clickCol = GetMouseX() / tileSize;
         int clickRow = GetMouseY() / tileSize;
         map[clickRow][clickCol].id = 2;
+    } else if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
+        int clickCol = GetMouseX() / tileSize;
+        int clickRow = GetMouseY() / tileSize;
+        map[clickRow][clickCol].id = 3;
+    }
+}
+void ClearMap(Node map[64][64], int nRows, int nCols, char mouseBtn) {
+    
+    //CHECK NODE TYPE TO ELIMINATE
+    int toEliminate = -1;
+    switch (mouseBtn) {
+        case 'L':
+            toEliminate = 1;
+            break;
+        case 'R':
+            toEliminate = 2;
+            break;
+    }
+
+    //ELIMINATE NODES OF TYPE AND ALL WALLS
+    for (int i = 0; i < nRows; i++) {
+        for (int j = 0; j < nCols; j++) {
+            Node & node = map[i][j];
+            if (node.id == toEliminate) {
+                node.id = 0;
+            } else if (node.id == 4) {
+                node.id = 0;
+            }
+        }
     }
 }
