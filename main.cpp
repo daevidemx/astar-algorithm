@@ -45,7 +45,7 @@ int main() {
         FindPath(map, nRows, nCols);
 
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground(LIGHTGRAY);
         RenderMap(map, nRows, nCols, tileSize);
         EndDrawing();
     }
@@ -59,20 +59,23 @@ void RenderMap(Node map[64][64], int nRows, int nCols, int tileSize) {
         for (int j = 0; j < nCols; j++) {
             Node & node = map[i][j];
             switch (node.id) {
-                case 0:
+                case 0:     //FLOOR
                     DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, WHITE);
                     break;
-                case 1:
-                    DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, RED);
+                case 1:     //START NODE
+                    DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, WHITE);
+                    DrawCircle(j * tileSize + (tileSize / 2), i * tileSize + (tileSize / 2), (tileSize / 2), RED);
                     break;
-                case 2:
-                    DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, GREEN);
+                case 2:     //END NODE
+                    DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, WHITE);
+                    DrawCircle(j * tileSize + (tileSize / 2), i * tileSize + (tileSize / 2), (tileSize / 2), GREEN);
                     break;
-                case 3:
+                case 3:     //WALL
                     DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, BLACK);
                     break;
-                case 4:
-                    DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, ORANGE);
+                case 4:     //PATH
+                    DrawRectangle(j * tileSize, i * tileSize, tileSize - 1, tileSize - 1, WHITE);
+                    DrawCircle(j * tileSize + (tileSize / 2), i * tileSize + (tileSize / 2), (tileSize / 4), GRAY);
                     break;
                 default:
                     break;
@@ -229,6 +232,8 @@ void ClearMap(Node map[64][64], int nRows, int nCols, char mouseBtn) {
             break;
         case 'R':
             toEliminate = 2;
+            break;
+        default:
             break;
     }
 
