@@ -2,6 +2,7 @@
 #include <cmath>
 #include <climits>
 #include <algorithm>
+#include <vector>
 
 struct From {
     int row;
@@ -27,9 +28,6 @@ int main() {
 
     //MAP
     Node map[64][64] = {node};
-    //map[32][22] = {1};
-    //map[63][63] = {2};
-
     int nRows = sizeof(map) / sizeof(map[0]);
     int nCols = sizeof(map[0]) / sizeof(map[0][0]);
     int tileSize = 12;
@@ -117,12 +115,16 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
         //CALCULATE F SCORE
         currNode.fScore = currNode.gScore + currNode.hScore;
 
+        //STORE MOVES (COORDINATES)
+        std::vector<From> path;
+
         //DO UNTIL CURRENT NODE IS AT END NODE
         while (currRow != endRow || currCol != endCol) {
 
+            //DECLARE VARIABLES
             int fBest = INT_MAX;
-            int nextRow = -1;
-            int nextCol = -1;
+            int nxtRow = -1;
+            int nxtCol = -1;
             bool foundEnd = false;
 
             //CHECK NEIGHBORING NODES
@@ -141,6 +143,8 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
 
                         //CHECK IF SCAN NODE IS END NODE
                         if (scnRow == endRow && scnCol == endCol) {
+                            scnNode.from = {currRow, currCol};
+                            path.push_back(scnNode.from);
                             foundEnd = true;
                             break;
                         }
@@ -165,9 +169,8 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
                         //CHECK IF BEST F SCORE
                         if (scnNode.fScore < fBest) {
                             fBest = scnNode.fScore;
-                            nextRow = scnRow;
-                            nextCol = scnCol;
-                            scnNode.id = 4;
+                            nxtRow = scnRow;
+                            nxtCol = scnCol;
                         }
                     }
                 }
@@ -179,12 +182,23 @@ void FindPath(Node map[64][64], int nRows, int nCols) {
                 break;
             }
 
-            //REGISTER WHICH NODE IS BEING JUMPED FROM
-            map[nextRow][nextCol].from = {currRow, currCol};
+            //REGISTER WHICH NODE IS BEING JUMPED FROM AND SAVES COORDS IN STACK
+            Node & nxtNode = map[nxtRow][nxtCol];
+            nxtNode.from = {currRow, currCol};
+            path.push_back(nxtNode.from);
 
             //SET NEXT COORDINATES
-            currRow = nextRow;
-            currCol = nextCol;
+            currRow = nxtRow;
+            currCol = nxtCol;
+        }
+
+        //FOLLOW FROM COORDS STARTING FROM END NODE
+        while (path.size() > 1) {
+            int lastRow = path.back().row;
+            int lastCol = path.back().col;
+            Node & pathNode = map[lastRow][lastCol];
+            pathNode.id = 4;
+            path.pop_back();
         }
     }
 }
